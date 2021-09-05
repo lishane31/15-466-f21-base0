@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include <vector>
+#include <list>
 #include <deque>
 
 /*
@@ -25,6 +26,7 @@ struct PongMode : Mode {
 
 	glm::vec2 court_radius = glm::vec2(7.0f, 5.0f);
 	glm::vec2 paddle_radius = glm::vec2(0.2f, 1.0f);
+    glm::vec2 block_radius = glm::vec2(0.2f, 0.2f);
 	glm::vec2 ball_radius = glm::vec2(0.2f, 0.2f);
 
 	glm::vec2 left_paddle = glm::vec2(-court_radius.x + 0.5f, 0.0f);
@@ -38,6 +40,8 @@ struct PongMode : Mode {
 
 	float ai_offset = 0.0f;
 	float ai_offset_update = 0.0f;
+
+    std::list<glm::vec2> blocks;
 
 	//----- pretty gradient trails -----
 
