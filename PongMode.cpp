@@ -13,6 +13,8 @@ PongMode::PongMode() {
     ball_velocities.emplace_back(glm::vec2(-1.0f, 0.0f));
     ball_trails.emplace_back(std::deque< glm::vec3 >());
 
+                    blocks.emplace_back(Block(glm::vec2(0, 0), expand));
+
     // balls.emplace_back(glm::vec2(0.0f, 0.0f));
     // ball_velocities.emplace_back(glm::vec2(1.0f, 0.0f));
     // ball_trails.emplace_back(std::deque< glm::vec3 >());
@@ -148,7 +150,7 @@ void PongMode::update(float elapsed) {
         block_update += elapsed;
         if(block_update > block_spawn) {
             block_update -= block_spawn;
-            int randType = mt() % 15;
+            int randType = mt() % 10;
 
             // float randX = (float) ((mt() % (unsigned int) court_radius.x)) - (int)(0.5f * court_radius.x);
             // float randY = (float) ((mt() % (unsigned int) court_radius.y)) - (int)(0.5f * court_radius.y);
@@ -159,22 +161,22 @@ void PongMode::update(float elapsed) {
             std::cout << court_radius.x << " " << court_radius.y << " " << randX << " " << randY << std::endl;
 
             switch(randType) {
-                case 9: 
+                case 1: 
                     blocks.emplace_back(Block(glm::vec2(randX, randY), split));
                     break;
-                case 10:
+                case 2:
                     blocks.emplace_back(Block(glm::vec2(randX, randY), del));
                     break;
-                case 11:
+                case 3:
                     blocks.emplace_back(Block(glm::vec2(randX, randY), leftScore));
                     break;
-                case 12:
+                case 4:
                     blocks.emplace_back(Block(glm::vec2(randX, randY), rightScore));
                     break;
-                case 13:
+                case 5:
                     blocks.emplace_back(Block(glm::vec2(randX, randY), shrink));
                     break;
-                case 14:
+                case 6:
                     blocks.emplace_back(Block(glm::vec2(randX, randY), expand));
                     break;
                 default:
@@ -264,10 +266,13 @@ void PongMode::update(float elapsed) {
     //blocks:
 	for(auto iter = blocks.begin(); iter != blocks.end(); iter++) {
         if(obj_vs_balls(iter->pos, block_radius)) {
-            std::cout << "Start do effect" << std::endl;
             doEffect(*iter);
-            blocks.erase(iter);
-            std::cout << "Done do effect" << std::endl;
+
+            //Shrinking or expanding removes all blocks, so break
+            if(!blocks.empty())
+                blocks.erase(iter);
+            else
+                break;
         }
     }
 

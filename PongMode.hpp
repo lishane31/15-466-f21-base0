@@ -65,7 +65,7 @@ struct PongMode : Mode {
 	float ai_offset_update = 0.0f;
 
     std::list<Block> blocks;
-    float block_spawn = 0.5f;
+    float block_spawn = 3.0f;
     float block_update = 0.0f;
 
 	//----- pretty gradient trails -----
@@ -153,6 +153,26 @@ struct PongMode : Mode {
             }
             case rightScore: {
                 right_score++;
+                return;
+            }
+            case shrink: {
+                court_radius = glm::vec2(3.5f, 2.5f);
+                paddle_radius = glm::vec2(0.1f, 0.5f);
+                ball_radius = glm::vec2(0.1f, 0.1f);
+                left_paddle = glm::vec2(-3.25f, 0);
+                right_paddle = glm::vec2(3.25f, 0);
+                trail_length = 0.65f;
+                blocks.clear();
+                return;
+            }
+            case expand: {
+                court_radius = glm::vec2(7.0f, 5.0f);
+                paddle_radius = glm::vec2(0.2f, 1.0f);
+                ball_radius = glm::vec2(0.2f, 0.2f);
+                left_paddle = glm::vec2(-court_radius.x + 0.5f, 0.0f);
+                right_paddle = glm::vec2( court_radius.x - 0.5f, 0.0f);
+                trail_length = 1.3f;
+                blocks.clear();
                 return;
             }
             default: return;
