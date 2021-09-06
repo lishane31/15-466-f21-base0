@@ -13,9 +13,10 @@ Screen Shot:
 ![Screen Shot](screenshot.png)
 
 How To Play:
+Use the mouse to move the paddle up and down and prevent the AI
+from hitting your wall.
 
-(TODO: describe the controls and (if needed) goals/strategy.)
-
-Sources: (TODO: list a source URL for any assets you did not create yourself. Make sure you have a license for the asset.)
+Sources: 
+Anything included in the base code
 
 This game was built with [NEST](NEST.md).
