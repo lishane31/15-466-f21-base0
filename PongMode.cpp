@@ -24,10 +24,6 @@ PongMode::PongMode() {
         ball_trails[i].emplace_back(balls[i], 0.0f);
     }
 
-
-	//Set up blocks
-    blocks.emplace_back(Block(glm::vec2(-court_radius.x + 2, 1.0f), leftScore));
-
 	//----- allocate OpenGL resources -----
 	{ //vertex buffer:
 		glGenBuffers(1, &vertex_buffer);
@@ -148,6 +144,45 @@ void PongMode::update(float elapsed) {
 	static std::mt19937 mt; //mersenne twister pseudo-random number generator
 
 	//----- paddle update -----
+    {
+        block_update += elapsed;
+        if(block_update > block_spawn) {
+            block_update -= block_spawn;
+            int randType = 1;
+
+            // float randX = (float) ((mt() % (unsigned int) court_radius.x)) - (int)(0.5f * court_radius.x);
+            // float randY = (float) ((mt() % (unsigned int) court_radius.y)) - (int)(0.5f * court_radius.y);
+
+            float randX = mt() % 8 * (court_radius.x / 5.0f) - 4.0f / 5.0f * court_radius.x;
+            float randY = mt() % 8 * (court_radius.y / 5.0f) - 4.0f / 5.0f * court_radius.y;
+
+            std::cout << court_radius.x << " " << court_radius.y << " " << randX << " " << randY << std::endl;
+
+            switch(randType) {
+                case 9: 
+                    blocks.emplace_back(Block(glm::vec2(randX, randY), split));
+                    break;
+                case 10:
+                    blocks.emplace_back(Block(glm::vec2(randX, randY), del));
+                    break;
+                case 11:
+                    blocks.emplace_back(Block(glm::vec2(randX, randY), leftScore));
+                    break;
+                case 12:
+                    blocks.emplace_back(Block(glm::vec2(randX, randY), rightScore));
+                    break;
+                case 13:
+                    blocks.emplace_back(Block(glm::vec2(randX, randY), shrink));
+                    break;
+                case 14:
+                    blocks.emplace_back(Block(glm::vec2(randX, randY), expand));
+                    break;
+                default:
+                    blocks.emplace_back(Block(glm::vec2(randX, randY), regular));
+                    break;
+            }
+        }
+    }
 
 	{ //right player ai:
 		ai_offset_update -= elapsed;
@@ -263,9 +298,12 @@ void PongMode::update(float elapsed) {
                     court_radius -= glm::vec2(0.7f, 0.5f);
                     paddle_radius -= glm::vec2(0.02f, 0.1f);
                     ball_radius -= glm::vec2(0.02f, 0.02f);
-                    left_paddle += glm::vec2(0.7f, 0);
-                    right_paddle -= glm::vec2(0.7f, 0);
+                    left_paddle += glm::vec2(0.7f - 0.05f, 0);
+                    right_paddle -= glm::vec2(0.7f + 0.05f, 0);
                     trail_length -= 0.13f;
+
+                    //Remove all blocks instead of re-placing them because I am bad at math
+                    blocks.clear();
                 }
             }
         }
@@ -281,9 +319,12 @@ void PongMode::update(float elapsed) {
                     court_radius -= glm::vec2(0.7f, 0.5f);
                     paddle_radius -= glm::vec2(0.02f, 0.1f);
                     ball_radius -= glm::vec2(0.02f, 0.02f);
-                    left_paddle += glm::vec2(0.7f, 0);
-                    right_paddle -= glm::vec2(0.7f, 0);
+                    left_paddle += glm::vec2(0.7f - 0.05f, 0);
+                    right_paddle -= glm::vec2(0.7f + 0.05f, 0);
                     trail_length -= 0.13f;
+                    
+                    //Remove all blocks instead of re-placing them because I am bad at math
+                    blocks.clear();
                 }
             }
         }

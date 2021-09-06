@@ -20,7 +20,7 @@ enum BLOCK_TYPE {
     leftScore = 4,
     rightScore = 5,
     shrink = 6,
-    expand = 7,
+    expand = 7
 };
 
 /**
@@ -65,6 +65,8 @@ struct PongMode : Mode {
 	float ai_offset_update = 0.0f;
 
     std::list<Block> blocks;
+    float block_spawn = 0.5f;
+    float block_update = 0.0f;
 
 	//----- pretty gradient trails -----
 
@@ -164,11 +166,12 @@ struct PongMode : Mode {
         //some nice colors from the course web page:
         #define HEX_TO_U8VEC4( HX ) (glm::u8vec4( (HX >> 24) & 0xff, (HX >> 16) & 0xff, (HX >> 8) & 0xff, (HX) & 0xff ))
         switch(block.type) {
-            case regular: return HEX_TO_U8VEC4(0x55ea46ee);
             case split: return HEX_TO_U8VEC4(0xffff00ee);
             case del: return HEX_TO_U8VEC4(0x000000ff);
             case leftScore: return HEX_TO_U8VEC4(0x55ea46ee);
             case rightScore: return HEX_TO_U8VEC4(0xdc143cee);
+            case shrink: return HEX_TO_U8VEC4(0x555555ff);
+            case expand: return HEX_TO_U8VEC4(0x5514eeee);
             default: return HEX_TO_U8VEC4(0xf2d2b6ff);
         }
     }
