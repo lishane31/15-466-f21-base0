@@ -148,7 +148,7 @@ void PongMode::update(float elapsed) {
         block_update += elapsed;
         if(block_update > block_spawn) {
             block_update -= block_spawn;
-            int randType = 1;
+            int randType = mt() % 15;
 
             // float randX = (float) ((mt() % (unsigned int) court_radius.x)) - (int)(0.5f * court_radius.x);
             // float randY = (float) ((mt() % (unsigned int) court_radius.y)) - (int)(0.5f * court_radius.y);

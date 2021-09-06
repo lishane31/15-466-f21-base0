@@ -1,8 +1,12 @@
-# (TODO: your game's title)
+# Astroid Destroyer Pong
 
-Author: (TODO: your name)
+Author: Siheng Li
 
-Design: (TODO: In two sentences or fewer, describe what is new and interesting about your game.)
+Design: There are now randomly spawning blocks in the game and the playing
+field now shrinks when you hit the opposing wall to increase the difficulty.
+Different blocks does different things: red and green provide points for the
+corresponding team, yellow doubles the amount of balls, black deletes half
+the balls, blue expands the playing field, and grey shrinks it.
 
 Screen Shot:
 
