@@ -64,7 +64,7 @@ struct PongMode : Mode {
 	float ai_offset = 0.0f;
 	float ai_offset_update = 0.0f;
 
-    std::list<Block> blocks;
+    std::vector<Block> blocks;
     float block_spawn = 3.0f;
     float block_update = 0.0f;
 
@@ -109,90 +109,10 @@ struct PongMode : Mode {
      * Called if the block is destroyed, 
      * perform the special block effect based on type 
      */
-    void doEffect(Block &block) {
-        switch(block.type) {
-            case split: {
-                std::cout << "Split in doEffect" << std::endl;
-                std::vector<glm::vec2> new_balls;
-                std::vector<glm::vec2> new_velocities;
-                std::vector<std::deque< glm::vec3 >> new_trails;
-
-                for(int i = 0; i < balls.size(); i++) {
-                    std::cout << "Ball #" << i << std::endl;
-                    //Double every ball on screen
-                    new_balls.emplace_back(balls[i]);
-                    new_balls.emplace_back(balls[i]);
-
-                    std::cout << "Velocity #" << i << std::endl;
-                    //Add spawn a ball flying in the opposite direction
-                    new_velocities.emplace_back(ball_velocities[i]);
-                    new_velocities.emplace_back(ball_velocities[i] * glm::vec2(1, -1.0f));
-
-                    //Add new trail
-                    new_trails.emplace_back(ball_trails[i]);
-                    new_trails.emplace_back(ball_trails[i]);
-                }
-
-                balls = new_balls;
-                ball_velocities = new_velocities;
-                ball_trails = new_trails;
-                return;
-            }
-            case del: {
-                const auto halfSize = balls.size()/2;
-                for(auto i = 0; i < halfSize; i++) {
-                    balls.pop_back();
-                    ball_velocities.pop_back();
-                    ball_trails.pop_back();
-                }
-                return;
-            }
-            case leftScore: {
-                left_score++;
-                return;
-            }
-            case rightScore: {
-                right_score++;
-                return;
-            }
-            case shrink: {
-                court_radius = glm::vec2(3.5f, 2.5f);
-                paddle_radius = glm::vec2(0.1f, 0.5f);
-                ball_radius = glm::vec2(0.1f, 0.1f);
-                left_paddle = glm::vec2(-3.25f, 0);
-                right_paddle = glm::vec2(3.25f, 0);
-                trail_length = 0.65f;
-                blocks.clear();
-                return;
-            }
-            case expand: {
-                court_radius = glm::vec2(7.0f, 5.0f);
-                paddle_radius = glm::vec2(0.2f, 1.0f);
-                ball_radius = glm::vec2(0.2f, 0.2f);
-                left_paddle = glm::vec2(-court_radius.x + 0.5f, 0.0f);
-                right_paddle = glm::vec2( court_radius.x - 0.5f, 0.0f);
-                trail_length = 1.3f;
-                blocks.clear();
-                return;
-            }
-            default: return;
-        }
-    }
+    void do_effect(Block &block);
 
     /**
      * Returns the color of this block depending on the type
      */
-    glm::u8vec4 getColor(Block &block) {
-        //some nice colors from the course web page:
-        #define HEX_TO_U8VEC4( HX ) (glm::u8vec4( (HX >> 24) & 0xff, (HX >> 16) & 0xff, (HX >> 8) & 0xff, (HX) & 0xff ))
-        switch(block.type) {
-            case split: return HEX_TO_U8VEC4(0xffff00ee);
-            case del: return HEX_TO_U8VEC4(0x000000ff);
-            case leftScore: return HEX_TO_U8VEC4(0x55ea46ee);
-            case rightScore: return HEX_TO_U8VEC4(0xdc143cee);
-            case shrink: return HEX_TO_U8VEC4(0x555555ff);
-            case expand: return HEX_TO_U8VEC4(0x5514eeee);
-            default: return HEX_TO_U8VEC4(0xf2d2b6ff);
-        }
-    }
+    glm::u8vec4 get_color(Block &block);
 };

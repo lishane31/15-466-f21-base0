@@ -158,8 +158,6 @@ void PongMode::update(float elapsed) {
             float randX = mt() % 8 * (court_radius.x / 5.0f) - 4.0f / 5.0f * court_radius.x;
             float randY = mt() % 8 * (court_radius.y / 5.0f) - 4.0f / 5.0f * court_radius.y;
 
-            std::cout << court_radius.x << " " << court_radius.y << " " << randX << " " << randY << std::endl;
-
             switch(randType) {
                 case 1: 
                     blocks.emplace_back(Block(glm::vec2(randX, randY), split));
@@ -264,13 +262,15 @@ void PongMode::update(float elapsed) {
 	obj_vs_balls(right_paddle, paddle_radius);
 
     //blocks:
-	for(auto iter = blocks.begin(); iter != blocks.end(); iter++) {
-        if(obj_vs_balls(iter->pos, block_radius)) {
-            doEffect(*iter);
+	for(int counter = 0; counter < blocks.size(); counter++) {
+        if(obj_vs_balls(blocks[counter].pos, block_radius)) {
+            do_effect(blocks[counter]);
 
             //Shrinking or expanding removes all blocks, so break
-            if(!blocks.empty())
-                blocks.erase(iter);
+            if(!blocks.empty()) {
+                blocks.erase(blocks.begin() + counter);
+                counter--;
+            }
             else
                 break;
         }
@@ -468,7 +468,7 @@ void PongMode::draw(glm::uvec2 const &drawable_size) {
 
     //Left blocks
     for(auto block: blocks) {
-	    draw_rectangle(block.pos, ball_radius * 2.0f, getColor(block));
+	    draw_rectangle(block.pos, ball_radius * 2.0f, get_color(block));
     }
 
 	//scores:
@@ -566,4 +566,86 @@ void PongMode::draw(glm::uvec2 const &drawable_size) {
 
 	GL_ERRORS(); //PARANOIA: print errors just in case we did something wrong.
 
+}
+
+void PongMode::do_effect(Block &block) {
+    std::cout << block.type << std::endl;
+    switch(block.type) {
+        case split: {
+            std::vector<glm::vec2> new_balls;
+            std::vector<glm::vec2> new_velocities;
+            std::vector<std::deque< glm::vec3 >> new_trails;
+
+            for(int i = 0; i < balls.size(); i++) {
+                //Double every ball on screen
+                new_balls.emplace_back(balls[i]);
+                new_balls.emplace_back(balls[i]);
+
+                //Add spawn a ball flying in the opposite direction
+                new_velocities.emplace_back(ball_velocities[i]);
+                new_velocities.emplace_back(ball_velocities[i] * glm::vec2(1, -1.0f));
+
+                //Add new trail
+                new_trails.emplace_back(ball_trails[i]);
+                new_trails.emplace_back(ball_trails[i]);
+            }
+
+            balls = new_balls;
+            ball_velocities = new_velocities;
+            ball_trails = new_trails;
+            return;
+        }
+        case del: {
+            const auto halfSize = balls.size()/2;
+            for(auto i = 0; i < halfSize; i++) {
+                balls.pop_back();
+                ball_velocities.pop_back();
+                ball_trails.pop_back();
+            }
+            return;
+        }
+        case leftScore: {
+            left_score++;
+            return;
+        }
+        case rightScore: {
+            right_score++;
+            return;
+        }
+        case shrink: {
+            court_radius = glm::vec2(3.5f, 2.5f);
+            paddle_radius = glm::vec2(0.1f, 0.5f);
+            ball_radius = glm::vec2(0.1f, 0.1f);
+            left_paddle = glm::vec2(-3.25f, 0);
+            right_paddle = glm::vec2(3.25f, 0);
+            trail_length = 0.65f;
+            blocks.clear();
+            return;
+        }
+        case expand: {
+            court_radius = glm::vec2(7.0f, 5.0f);
+            paddle_radius = glm::vec2(0.2f, 1.0f);
+            ball_radius = glm::vec2(0.2f, 0.2f);
+            left_paddle = glm::vec2(-court_radius.x + 0.5f, 0.0f);
+            right_paddle = glm::vec2( court_radius.x - 0.5f, 0.0f);
+            trail_length = 1.3f;
+            blocks.clear();
+            return;
+        }
+        default: return;
+    }
+}
+
+glm::u8vec4 PongMode::get_color(Block &block) {
+    //some nice colors from the course web page:
+    #define HEX_TO_U8VEC4( HX ) (glm::u8vec4( (HX >> 24) & 0xff, (HX >> 16) & 0xff, (HX >> 8) & 0xff, (HX) & 0xff ))
+    switch(block.type) {
+        case split: return HEX_TO_U8VEC4(0xffff00ee);
+        case del: return HEX_TO_U8VEC4(0x000000ff);
+        case leftScore: return HEX_TO_U8VEC4(0x55ea46ee);
+        case rightScore: return HEX_TO_U8VEC4(0xdc143cee);
+        case shrink: return HEX_TO_U8VEC4(0x555555ff);
+        case expand: return HEX_TO_U8VEC4(0x5514eeee);
+        default: return HEX_TO_U8VEC4(0xf2d2b6ff);
+    }
 }
